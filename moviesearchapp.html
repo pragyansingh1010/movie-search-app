@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Search App</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            margin: 0;
+            padding: 50px 20px;
+            background: #f2f2f2;
+        }
+
+        .container {
+            width: 500px;
+            max-width: 90%;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+        }
+
+        input {
+            width: 65%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 12px 18px;
+            margin-left: 5px;
+            border: none;
+            border-radius: 5px;
+            background: #333;
+            color: white;
+            cursor: pointer;
+        }
+
+        #movie {
+            margin-top: 25px;
+        }
+
+        #movie img {
+            width: 200px;
+            border-radius: 8px;
+        }
+
+        #title {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        #error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>Movie Search App</h2>
+
+        <input type="text" id="search" placeholder="Enter movie title">
+
+        <button onclick="searchMovie()">Search</button>
+
+        <div id="movie"></div>
+
+        <p id="error"></p>
+
+    </div>
+
+    <script>
+        const apiKey = "2ebe1f22";
+
+        async function searchMovie() {
+            let title = document.getElementById("search").value.trim();
+
+            if (title == "") {
+                document.getElementById("error").innerHTML =
+                    "Please enter a movie title.";
+                document.getElementById("movie").innerHTML = "";
+                return;
+            }
+
+            document.getElementById("error").innerHTML = "Loading...";
+
+            try {
+                let url =
+                    "https://www.omdbapi.com/?apikey=" +
+                    apiKey +
+                    "&t=" +
+                    encodeURIComponent(title);
+
+                let response = await fetch(url);
+                let data = await response.json();
+
+                if (data.Response == "False") {
+                    document.getElementById("movie").innerHTML = "";
+
+                    document.getElementById("error").innerHTML =
+                        "Movie not found.";
+
+                    return;
+                }
+
+                document.getElementById("error").innerHTML = "";
+
+                let poster = data.Poster;
+
+                if (poster == "N/A") {
+                    poster = "";
+                }
+
+                document.getElementById("movie").innerHTML =
+                    (poster != ""
+                        ? "<img src='" + poster + "'>"
+                        : "") +
+
+                    "<p id='title'>" +
+                    data.Title +
+                    "</p>" +
+
+                    "<p>Release Year: " +
+                    data.Year +
+                    "</p>" +
+
+                    "<p>Rating: " +
+                    data.imdbRating +
+                    "/10</p>" +
+
+                    "<p>Genre: " +
+                    data.Genre +
+                    "</p>" +
+
+                    "<p>Plot: " +
+                    data.Plot +
+                    "</p>";
+            }
+            catch (error) {
+                document.getElementById("movie").innerHTML = "";
+
+                document.getElementById("error").innerHTML =
+                    "Unable to fetch movie data.";
+            }
+        }
+    </script>
+
+</body>
+</html>
